@@ -3,11 +3,21 @@ import jwt from "jsonwebtoken";
 
 export const createEvent = async (req, res) => {
   try {
-    const { userId } = jwt.verify(
-      req.cookies.token,
-      process.env.JWT_SECRET_KEY,
-    );
-    console.log(userId);
+    const token = req.cookies.token;
+
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized: No token" });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    } catch (err) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    const { userId } = decoded;
+
     const {
       title,
       description,
@@ -19,7 +29,7 @@ export const createEvent = async (req, res) => {
     } = req.body;
 
     console.log("Hello world");
-    
+
     console.log(req.body);
 
     // basic validation
