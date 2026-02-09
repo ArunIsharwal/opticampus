@@ -1,8 +1,12 @@
 import express from "express";
-import { getAllEvents } from "../controllers/staff.controller.js";
+import {
+  getAllEvents,
+  updateEventStatus,
+} from "../controllers/staff.controller.js";
 
 const router = express.Router();
 
 router.get("/get-all-events", getAllEvents);
+router.post("/event/status", updateEventStatus);
 
 export default router;

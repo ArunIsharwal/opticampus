@@ -1,43 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import {
-  FileText,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  Eye,
-} from "lucide-react";
+import { FileText, Clock, CheckCircle2, XCircle, Eye } from "lucide-react";
+import { baseUrl } from "@/App";
 
-const mockRequests = [
-  {
-    id: 1,
-    title: "Annual Tech Fest",
-    date: "12 Feb 2026",
-    status: "approved",
-  },
-  {
-    id: 2,
-    title: "AI Workshop",
-    date: "18 Feb 2026",
-    status: "pending",
-  },
-  {
-    id: 3,
-    title: "Coding Contest",
-    date: "20 Feb 2026",
-    status: "rejected",
-  },
-  {
-    id: 4,
-    title: "Robotics Club Meet",
-    date: "02 Jan 2026",
-    status: "approved",
-  },
-];
-
-const statusConfig: any = {
+const statusConfig: Record<string, any> = {
   approved: {
     label: "Approved",
     icon: CheckCircle2,
@@ -56,43 +24,75 @@ const statusConfig: any = {
 };
 
 const MyRequestshistory = () => {
-  const [showAll, setShowAll] = useState(false);
+  const [requests, setRequests] = useState<any[]>([]);
 
-  const visibleRequests = showAll
-    ? mockRequests
-    : mockRequests.slice(0, 3);
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const res = await fetch(`${baseUrl}/api/student/get-events`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) return;
+
+        setRequests(Array.isArray(data.events) ? data.events : []);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchRequests();
+  }, []);
+
+  const formatDate = (date?: string) => {
+    if (!date) return "--";
+    return new Date(date).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   return (
     <DashboardLayout userRole="student" userName="Arun">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-3xl font-bold mb-1">
-            My Requests
-          </h1>
-          <p className="text-muted-foreground">
-            Track all event requests you’ve submitted for approval
-          </p>
-        </div>
-
-        {mockRequests.length > 2 && (
-          <Button
-            variant="outline"
-            onClick={() => setShowAll(!showAll)}
-          >
-            {showAll ? "Show Less" : "View All Requests"}
-          </Button>
-        )}
+      <div className="mb-8">
+        <h1 className="font-display text-3xl font-bold mb-1">My Requests</h1>
+        <p className="text-muted-foreground">
+          Track all event requests you’ve submitted for approval
+        </p>
       </div>
+
+      {/* Empty State */}
+      {requests.length === 0 && (
+        <div className="text-center text-muted-foreground py-10">
+          No requests found
+        </div>
+      )}
 
       {/* Requests List */}
       <div className="space-y-4">
-        {visibleRequests.map((req, index) => {
-          const StatusIcon = statusConfig[req.status].icon;
+        {requests.map((req, index) => {
+          const rawStatus = typeof req.status === "string"
+            ? req.status.toLowerCase()
+            : "pending";
+
+          const statusKey = statusConfig[rawStatus]
+            ? rawStatus
+            : "pending";
+
+          const statusData = statusConfig[statusKey];
+          const StatusIcon = statusData.icon;
 
           return (
             <motion.div
-              key={req.id}
+              key={req._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.08 }}
@@ -105,11 +105,9 @@ const MyRequestshistory = () => {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg">
-                    {req.title}
-                  </h3>
+                  <h3 className="font-semibold text-lg">{req.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Requested on {req.date}
+                    Requested on {formatDate(req.createdAt)}
                   </p>
                 </div>
               </div>
@@ -117,10 +115,10 @@ const MyRequestshistory = () => {
               {/* Right */}
               <div className="flex items-center gap-4">
                 <div
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${statusConfig[req.status].class}`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${statusData.class}`}
                 >
                   <StatusIcon className="w-4 h-4" />
-                  {statusConfig[req.status].label}
+                  {statusData.label}
                 </div>
 
                 <Button variant="outline" size="sm">

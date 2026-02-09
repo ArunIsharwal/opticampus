@@ -38,7 +38,12 @@ const eventSchema = new mongoose.Schema(
     purpose: {
       type: String,
       required: true,
-      enum: ["class", "meetings", "event", "workshop"],
+      enum: ["class", "meeting", "event", "workshop"],
+    },
+    status: {
+      type: String,
+      enum: ["Pending", "Rejected", "Approved"],
+      default: "Pending",
     },
   },
   { timestamps: true },

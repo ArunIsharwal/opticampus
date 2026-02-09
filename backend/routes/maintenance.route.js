@@ -1,8 +1,8 @@
 import express from "express";
-import { getAllEvents } from "../controllers/staff.controller.js";
+import { getAllIssues } from "../controllers/maintenance.controller.js";
 
 const router = express.Router();
 
-router.get("/get-all-issues", getAllEvents);
+router.get("/get-all-issues", getAllIssues);
 
 export default router;

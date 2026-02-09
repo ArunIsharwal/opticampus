@@ -16,16 +16,19 @@ const useGetEventsForStudents = () => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(`${baseUrl}/api/student/get-events`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${baseUrl}/api/maintenance/get-all-issues`,
+          {
+            credentials: "include",
+          }
+        );
+        
 
-        if (!response.ok) {
+        if (!res.ok) {
           throw new Error("Failed to fetch events");
         }
 
-        const data = await response.json();
+        const data = await res.json();
         dispatch(setEventsForStudents(data.events as Event[]));
       } catch (err: any) {
         setError(err.message);
