@@ -19,36 +19,6 @@ import {
 } from "lucide-react";
 import { baseUrl } from "@/App";
 
-// const suggestedRooms = [
-//   {
-//     id: 1,
-//     name: "Room A-105",
-//     building: "Block A",
-//     capacity: 50,
-//     energyScore: 92,
-//     status: "recommended",
-//     features: ["Projector", "AC", "Whiteboard"],
-//   },
-//   {
-//     id: 2,
-//     name: "Seminar Hall B2",
-//     building: "Block B",
-//     capacity: 100,
-//     energyScore: 78,
-//     status: "available",
-//     features: ["Projector", "AC", "Mic System"],
-//   },
-//   {
-//     id: 3,
-//     name: "Conference Room C1",
-//     building: "Block C",
-//     capacity: 30,
-//     energyScore: 85,
-//     status: "available",
-//     features: ["TV Screen", "AC", "Video Conf"],
-//   },
-// ];
-
 const EventRequestPage = () => {
   const [step, setStep] = useState(1);
   // const [selectedRoom, setSelectedRoom] = useState<number | null>(null);
@@ -66,24 +36,6 @@ const EventRequestPage = () => {
     e.preventDefault();
 
     try {
-      // STEP 1 → just validate + move to room selection
-      if (step === 1) {
-        // basic frontend validation (optional but safe)
-        if (
-          !formData.title ||
-          !formData.date ||
-          !formData.startTime ||
-          !formData.endTime ||
-          !formData.participants
-        ) {
-          return alert("Please fill all required fields");
-        }
-
-        setStep(2);
-
-      }
-
-      // STEP 2 → submit to backend
       const response = await fetch(`${baseUrl}/api/student/create-event`, {
         method: "POST",
         credentials: "include",
@@ -108,9 +60,8 @@ const EventRequestPage = () => {
         throw new Error(data.message || "Failed to create event");
       }
 
-      console.log(data);
+      console.log("Data: ", data);
 
-      // success → confirmation step
       setStep(3);
     } catch (error: any) {
       console.error("Event request failed:", error.message);
@@ -299,124 +250,12 @@ const EventRequestPage = () => {
               </div>
 
               <Button type="submit" variant="hero" size="lg" className="w-full">
-                Find Best Room <ArrowRight className="ml-2 w-5 h-5" />
+                Submit Request <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </form>
           </div>
         </motion.div>
       )}
-
-      {/* {step === 2 && (
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="max-w-4xl mx-auto"
-        >
-          <div className="mb-6">
-            <h2 className="font-display text-2xl font-bold mb-2">
-              Smart Room Suggestions
-            </h2>
-            <p className="text-muted-foreground">
-              Based on energy efficiency and building activity.
-              <span className="text-primary font-medium">
-                {" "}
-                Lower carbon footprint = Higher score!
-              </span>
-            </p>
-          </div>
-
-          <div className="space-y-4 mb-6">
-            {suggestedRooms.map((room, index) => (
-              <motion.div
-                key={room.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                onClick={() => setSelectedRoom(room.id)}
-                className={`bg-card border-2 rounded-2xl p-6 cursor-pointer transition-all ${
-                  selectedRoom === room.id
-                    ? "border-primary shadow-glow"
-                    : "border-border hover:border-primary/30"
-                } ${room.status === "recommended" ? "relative overflow-hidden" : ""}`}
-              >
-                {room.status === "recommended" && (
-                  <div className="absolute top-4 right-4">
-                    <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
-                      <Leaf className="w-3 h-3" /> Recommended
-                    </span>
-                  </div>
-                )}
-
-                <div className="flex items-start gap-6">
-                  <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Building2 className="w-8 h-8 text-primary" />
-                  </div>
-
-                  <div className="flex-1">
-                    <h3 className="font-display text-xl font-semibold mb-1">
-                      {room.name}
-                    </h3>
-                    <p className="text-muted-foreground mb-3">
-                      {room.building}
-                    </p>
-
-                    <div className="flex flex-wrap gap-4 text-sm">
-                      <div className="flex items-center gap-1">
-                        <Users className="w-4 h-4 text-muted-foreground" />
-                        <span>Capacity: {room.capacity}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Zap className="w-4 h-4 text-primary" />
-                        <span className="text-primary font-medium">
-                          Energy Score: {room.energyScore}%
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 mt-3">
-                      {room.features.map((feature) => (
-                        <span
-                          key={feature}
-                          className="bg-muted text-muted-foreground text-xs px-2 py-1 rounded"
-                        >
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div
-                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      selectedRoom === room.id
-                        ? "border-primary bg-primary"
-                        : "border-border"
-                    }`}
-                  >
-                    {selectedRoom === room.id && (
-                      <CheckCircle2 className="w-4 h-4 text-primary-foreground" />
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="flex gap-4">
-            <Button variant="outline" size="lg" onClick={() => setStep(1)}>
-              Back
-            </Button>
-            <Button
-              variant="hero"
-              size="lg"
-              className="flex-1"
-              onClick={() => setStep(3)}
-              disabled={!selectedRoom}
-            >
-              Submit Request <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </div>
-        </motion.div>
-      )} */}
 
       {step === 3 && (
         <motion.div

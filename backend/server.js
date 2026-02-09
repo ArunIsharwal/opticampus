@@ -10,7 +10,6 @@ import staff from "./routes/staff.route.js";
 import student from "./routes/student.route.js";
 
 await connectDB();
-
 const app = express();
 
 app.use(cors({ origin: "http://localhost:8080", credentials: true }));
@@ -20,7 +19,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/staff", staff);
 app.use("/api/student", student);
-app.use("/api/student", student);
+// app.use("/api/student", student);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

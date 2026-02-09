@@ -1,5 +1,6 @@
 import Event from "../models/Event.js";
 import jwt from "jsonwebtoken";
+import Issues from "../models/Issues.js";
 
 export const createEvent = async (req, res) => {
   try {
@@ -93,6 +94,52 @@ export const getEventsByStudentId = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Error fetching events",
+      error: error.message,
+    });
+  }
+};
+
+export const createIssue = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+
+    console.log(req.cookies);
+    
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized: No token" });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    } catch (err) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    const { userId } = decoded;
+
+    const { description, issueType } = req.body;
+
+    console.log("Hello world");
+    console.log(req.body);
+
+    const request = await Issues.create({
+      studentId: userId,
+      description,
+      issueType,
+    });
+
+    
+
+    res.status(201).json({
+      message: "Issue created successfully",
+      request,
+    });
+  } catch (error) {
+    console.log("Error: ", error);
+
+    res.status(500).json({
+      message: "Error creating Issue",
       error: error.message,
     });
   }
