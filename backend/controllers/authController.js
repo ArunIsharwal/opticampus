@@ -176,13 +176,29 @@ export const verifyOtp = async (req, res) => {
 
     const token = generateToken({ userId: user._id });
 
-    return res.status(200).json({
-      message: "OTP verified successfully",
-      token,
-      role: user.role,
-      name: user.name,
-      email: user.email,
-    });
+    // return res.status(200).json({
+    //   message: "OTP verified successfully",
+    //   token,
+    //   role: user.role,
+    //   name: user.name,
+    //   email: user.email,
+    // });
+
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "None",
+  
+});
+
+return res.status(200).json({
+  message: "OTP verified successfully",
+  role: user.role,
+  name: user.name,
+  email: user.email,
+});
+
+
   } catch (error) {
     console.error("Verify OTP error:", error);
     return res.status(500).json({ message: "OTP verification failed" });
@@ -220,11 +236,19 @@ export const login = async (req, res) => {
     // 4. Generate token
     const token = generateToken({ userId: user._id });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false, // true in production
-      sameSite: "None",
-    });
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   secure: false, // true in production
+    //   sameSite: "None",
+    // });
+
+  res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,       
+  sameSite: "None",    
+  
+});
+
 
     // 5. Send user data
     return res.status(200).json({
