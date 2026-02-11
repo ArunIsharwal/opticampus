@@ -20,13 +20,6 @@ const userSchema = new mongoose.Schema(
       enum: ["student", "faculty", "admin", "maintenance"],
       default: "student",
     },
-
-    emailOtp: Number,
-
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
-    },
   },
   { timestamps: true },
 );
