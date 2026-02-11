@@ -103,9 +103,12 @@ app.use(
     origin: (origin, callback) => {
       const allowedOrigins = [
         "http://localhost:8080",
+        "http://localhost:5173",
         "https://opticampus-beta.vercel.app",
+        "https://opticampus-rao2qlina-arunisharwals-projects.vercel.app",
       ];
 
+      // Allow requests with no origin (like mobile apps, curl requests)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
